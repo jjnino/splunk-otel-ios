@@ -25,7 +25,7 @@ import OpenTelemetryApi
 // - span rejection based on setRejectionFilter
 
 class LimitingExporter: SpanExporter {
-    let MAX_ATTRIBUTE_LENGTH = 4096
+//    let MAX_ATTRIBUTE_LENGTH = 4096
     static let SPAN_RATE_LIMIT_PERIOD = 30 // seconds
     let MAX_SPANS_PER_PERIOD_PER_COMPONENT = 100
 
@@ -41,18 +41,19 @@ class LimitingExporter: SpanExporter {
 
     // Returns true if span should be dropped
     func rateLimit(_ span: SpanData) -> Bool {
-        let component = span.attributes["component"]?.description ?? "unknown"
-        var count = component2counts[component] ?? 0
-        count += 1
-        component2counts[component] = count
-        return count > MAX_SPANS_PER_PERIOD_PER_COMPONENT
+//        let component = span.attributes["component"]?.description ?? "unknown"
+//        var count = component2counts[component] ?? 0
+//        count += 1
+//        component2counts[component] = count
+//        return count > MAX_SPANS_PER_PERIOD_PER_COMPONENT
+        return false
     }
 
     // Returns true if span should be rejected
     func filter(_ span: SpanData) -> SpanData? {
-        if spanFilter != nil {
-            return spanFilter!(span)
-        }
+//        if spanFilter != nil {
+//            return spanFilter!(span)
+//        }
         return span
     }
 
@@ -63,13 +64,14 @@ class LimitingExporter: SpanExporter {
             if !rateLimit(span) {
                 var toAdd = filter(span)
                 if toAdd != nil {
-                    let newAttrs = toAdd!.attributes.mapValues { val -> AttributeValue in
-                        let str = val.description
-                        if str.count > MAX_ATTRIBUTE_LENGTH {
-                            return .string(String(str.prefix(MAX_ATTRIBUTE_LENGTH)))
-                        }
-                        return val
-                    }
+                    let newAttrs = toAdd!.attributes
+//                        .mapValues { val -> AttributeValue in
+//                            let str = val.description
+//                            if str.count > MAX_ATTRIBUTE_LENGTH {
+//                                return .string(String(str.prefix(MAX_ATTRIBUTE_LENGTH)))
+//                            }
+//                            return val
+//                        }
                     toAdd!.settingAttributes(newAttrs)
                     result.append(toAdd!)
                 }
